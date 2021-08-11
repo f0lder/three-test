@@ -9,6 +9,7 @@
     </style>
   </head>
   <body>
+    <input type="text"></input>
     <script type="module">
       import * as THREE from "https://threejs.org/build/three.module.js";
       import { OrbitControls } from "https://threejs.org/examples/jsm/controls/OrbitControls.js";
@@ -35,7 +36,7 @@
           1,
           10000
         );
-        camera.position.set(20, 20, 20);
+        camera.position.set(10, 10, 10);
 
         // controls
         controls = new OrbitControls(camera, renderer.domElement);
@@ -49,7 +50,7 @@
         scene.add(light);
 
         // axes
-        scene.add(new THREE.AxesHelper(20));
+        scene.add(new THREE.AxesHelper(10));
         scene.add(new THREE.GridHelper(20,20));
         // geometry
         var geometry = new THREE.SphereGeometry(2, 6, 4);
@@ -73,11 +74,11 @@
 
         var cubes = {};
         var distance = 0;
-        for (var i = 1; i <= 10; i++) {
+        for (var i = 1; i <= 50; i++) {
           cubes[i] = new THREE.Mesh(cubeGeometry, CubeMaterial);
           distance +=1;
           cubes[i].position.z= distance;
-          cubes[i].scale.set(0.2*i,0.2*i,0.2*i);
+          cubes[i].scale.set(.5, .5,.5)
           scene.add(cubes[i]);
         }
       }
