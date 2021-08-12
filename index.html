@@ -5,6 +5,10 @@
     <style>
       body {
         margin: 0;
+        background-color: black;
+      }
+      input {
+        position: absolute;
       }
     </style>
   </head>
@@ -68,7 +72,7 @@
         })
         // mesh
         mesh = new THREE.Mesh(geometry, material);
-        scene.add(mesh);
+        //scene.add(mesh);
 
         var cubeGeometry = new THREE.BoxGeometry();
 
