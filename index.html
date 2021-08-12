@@ -32,19 +32,30 @@
       import * as THREE from "https://threejs.org/build/three.module.js";
       import { OrbitControls } from "https://threejs.org/examples/jsm/controls/OrbitControls.js";
 
-      var mesh, renderer, scene, camera, controls;
+      var mesh, renderer, scene, camera, controls, mouse, raycaster;
 
       init();
       animate();
 
       function init() {
         // renderer
-        renderer = new THREE.WebGLRenderer();
+        renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         document.body.appendChild(renderer.domElement);
         renderer.setClearColor(0xffffff, 0.5);
 
+        //raycast and mouse
+        mouse = new THREE.Vector2();
+        raycaster = new THREE.Raycaster();
+        function onMouseMove(event) {
+          // calculate mouse position in normalized device coordinates
+          // (-1 to +1) for both components
+
+          mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+          mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        }
+        window.addEventListener("click", onMouseMove);
         // scene
         scene = new THREE.Scene();
 
@@ -80,54 +91,75 @@
           transparent: true,
           opacity: 0.7,
         });
-        var whiteMaterial = new THREE.MeshBasicMaterial({
-          color: "white",
-          opacity: 1,
-        });
-        var balckMaterial = new THREE.MeshBasicMaterial({
-          color: "black",
-          opacity: 1,
-        });
-        
-        var tabla= new THREE.Group();
         var cubeGeometry = new THREE.BoxGeometry();
 
         var cubes = {};
         var distance = 0;
-        function createLine(X, Y, startC) {
+        function createLine(X, Y, startC, size) {
           //0 = white, 1 = black
           for (var i = 1; i <= 8; i++) {
             if (startC == 0) {
               if (i % 2 != 0) {
-                cubes[i] = new THREE.Mesh(cubeGeometry, balckMaterial);
+                cubes[i] = new THREE.Mesh(
+                  cubeGeometry,
+                  new THREE.MeshBasicMaterial({ color: "black" })
+                );
               } else {
-                cubes[i] = new THREE.Mesh(cubeGeometry, whiteMaterial);
+                cubes[i] = new THREE.Mesh(
+                  cubeGeometry,
+                  new THREE.MeshBasicMaterial({ color: "white" })
+                );
               }
             }
             if (startC == 1) {
               if (i % 2 == 0) {
-                cubes[i] = new THREE.Mesh(cubeGeometry, balckMaterial);
+                cubes[i] = new THREE.Mesh(
+                  cubeGeometry,
+                  new THREE.MeshBasicMaterial({ color: "black" })
+                );
               } else {
-                cubes[i] = new THREE.Mesh(cubeGeometry, whiteMaterial);
+                cubes[i] = new THREE.Mesh(
+                  cubeGeometry,
+                  new THREE.MeshBasicMaterial({ color: "white" })
+                );
               }
             }
             cubes[i].position.x = X + distance;
-            cubes[i].position.z = Y * 5;
-            cubes[i].scale.set(5, 5, 5);
-            distance += 5;
-            tabla.add(cubes[i]);
+            cubes[i].position.z = Y * size;
+            cubes[i].scale.set(size, size, size);
+            distance += size;
+            scene.add(cubes[i]);
           }
           distance = 0;
         }
-        for (var i = 1; i <= 8; i++) {
-          createLine(1, i, i % 2);
+        function tabla(Tilesperrow, sizeOfTiles) {
+          for (var i = 1; i <= Tilesperrow; i++) {
+            createLine(1, i, i % 2, sizeOfTiles);
+          }
         }
-        scene.add(tabla)
+        tabla(8, 10);
+      }
+      function hoverTile() {
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(scene.children);
+
+        for (let i = 0; i < intersects.length; i++) {
+          intersects[0].object.material.opacity = 0.5;
+          intersects[0].object.material.transparent = true;
+        }
+      }
+      function resetMaterials() {
+        for (let i = 0; i < scene.children.length; i++) {
+          if (scene.children[i].material) {
+            scene.children[i].material.opacity = 1;
+          }
+        }
       }
       function animate() {
         requestAnimationFrame(animate);
-
-        controls.update();
+        resetMaterials();
+        hoverTile();
+        //controls.update();
         renderer.render(scene, camera);
       }
     </script>
