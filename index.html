@@ -6,25 +6,26 @@
       body {
         margin: 0;
         background-color: black;
-        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+          "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
       }
       #test {
         position: absolute;
-        top:5%;
+        top: 5%;
         left: 5%;
         width: 20em;
         height: 5em;
         background-color: white;
         padding: 1em;
       }
-      #test input{
+      #test input {
         margin: 1em;
       }
     </style>
   </head>
   <body>
     <div id="test">
-      <input type="text"></input>
+      <input type="text" />
       <p>TEST NOT FINAL PRODUCT</p>
     </div>
     <script type="module">
@@ -42,7 +43,7 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         document.body.appendChild(renderer.domElement);
-        renderer.setClearColor( 0xffffff, 0.5);
+        renderer.setClearColor(0xffffff, 0.5);
 
         // scene
         scene = new THREE.Scene();
@@ -54,7 +55,7 @@
           1,
           10000
         );
-        camera.position.set(10, 10, 10);
+        camera.position.set(15, 15, 15);
 
         // controls
         controls = new OrbitControls(camera, renderer.domElement);
@@ -69,9 +70,8 @@
 
         // axes
         scene.add(new THREE.AxesHelper(10));
-        scene.add(new THREE.GridHelper(20,20));
+        scene.add(new THREE.GridHelper(20, 20));
         // geometry
-        var geometry = new THREE.SphereGeometry(2, 6, 4);
 
         // material
         var material = new THREE.MeshPhongMaterial({
@@ -82,53 +82,52 @@
         });
         var whiteMaterial = new THREE.MeshBasicMaterial({
           color: "white",
-          opacity:1,
-        })
+          opacity: 1,
+        });
         var balckMaterial = new THREE.MeshBasicMaterial({
           color: "black",
-          opacity:1,
-        })
-        // mesh
-        mesh = new THREE.Mesh(geometry, material);
-        //scene.add(mesh);
-
+          opacity: 1,
+        });
+        
+        var tabla= new THREE.Group();
         var cubeGeometry = new THREE.BoxGeometry();
 
         var cubes = {};
         var distance = 0;
-        function createLine(X,Y,startC){//0 = white, 1 = black
+        function createLine(X, Y, startC) {
+          //0 = white, 1 = black
+          for (var i = 1; i <= 8; i++) {
+            if (startC == 0) {
+              if (i % 2 != 0) {
+                cubes[i] = new THREE.Mesh(cubeGeometry, balckMaterial);
+              } else {
+                cubes[i] = new THREE.Mesh(cubeGeometry, whiteMaterial);
+              }
+            }
+            if (startC == 1) {
+              if (i % 2 == 0) {
+                cubes[i] = new THREE.Mesh(cubeGeometry, balckMaterial);
+              } else {
+                cubes[i] = new THREE.Mesh(cubeGeometry, whiteMaterial);
+              }
+            }
+            cubes[i].position.x = X + distance;
+            cubes[i].position.z = Y * 5;
+            cubes[i].scale.set(5, 5, 5);
+            distance += 5;
+            tabla.add(cubes[i]);
+          }
+          distance = 0;
+        }
         for (var i = 1; i <= 8; i++) {
-          if(startC ==0){
-          if(i%2==0){
-            cubes[i] = new THREE.Mesh(cubeGeometry,balckMaterial);
-          } else{
-          cubes[i] = new THREE.Mesh(cubeGeometry, whiteMaterial);
-          }
+          createLine(1, i, i % 2);
         }
-        if(startC ==1){
-          if(i%2!=0){
-            cubes[i] = new THREE.Mesh(cubeGeometry,balckMaterial);
-          } else{
-          cubes[i] = new THREE.Mesh(cubeGeometry, whiteMaterial);
-          }
-        }
-          distance +=5;
-          cubes[i].position.x=X+distance;
-          cubes[i].position.z=Y*5;
-          cubes[i].scale.set(5, 5,5)
-          scene.add(cubes[i]);
-        }
-        distance=0;
+        scene.add(tabla)
       }
-      for(var i=1;i<=8;i++){
-        createLine(1,i,i%2);
-      }
-    }
       function animate() {
         requestAnimationFrame(animate);
 
         controls.update();
-
         renderer.render(scene, camera);
       }
     </script>
