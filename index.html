@@ -34,6 +34,7 @@
 
       var mesh, renderer, scene, camera, controls, mouse, raycaster,distance;
       let group = new THREE.Group();
+      let id = 1;
       init();
       animate();
 
@@ -48,6 +49,7 @@
         //raycast and mouse
         mouse = new THREE.Vector2();
         raycaster = new THREE.Raycaster();
+
         function onMouseMove(event) {
           event.preventDefault();
           // calculate mouse position in normalized device coordinates
@@ -56,7 +58,7 @@
           mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
           mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
         }
-        window.addEventListener("click", onMouseMove);
+        window.addEventListener("mousemove", onMouseMove);
         // scene
         scene = new THREE.Scene();
         scene.add(group);
@@ -84,8 +86,7 @@
 
         // axes
         scene.add(new THREE.AxesHelper(10));
-        scene.add(new THREE.GridHelper(20, 20));
-        // geometry
+        
 
         // material
         var material = new THREE.MeshPhongMaterial({
@@ -97,7 +98,6 @@
         var cubeGeometry = new THREE.BoxGeometry();
 
         var cubes = {};
-        let id = 1;
         function createLine(X, Y, startC, size) {
           //0 = white, 1 = black
           for (var i = 1; i <= 8; i++) {
@@ -149,7 +149,7 @@
         if (intersects.length > 0) {
             intersects[0].object.material.opacity = 0.5;
             intersects[0].object.material.transparent = true;
-            intersects[0].object.position.y+=.5;
+            intersects[0].object.position.y+=2;
         }
       }
       function resetMaterials() {
