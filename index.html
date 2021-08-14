@@ -28,11 +28,19 @@
       <input type="text" />
       <p>TEST NOT FINAL PRODUCT</p>
     </div>
+    <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script type="module">
-      import * as THREE from "https://threejs.org/build/three.module.js";
+     // import * as THREE from "https://threejs.org/build/three.module.js";
       import { OrbitControls } from "https://threejs.org/examples/jsm/controls/OrbitControls.js";
-
-      var mesh, renderer, scene, camera, controls, mouse, raycaster,distance;
+      var mesh,
+        renderer,
+        scene,
+        camera,
+        controls,
+        mouse,
+        raycaster,
+        distance;
       let group = new THREE.Group();
       let id = 1;
       init();
@@ -45,6 +53,8 @@
         renderer.setPixelRatio(window.devicePixelRatio);
         document.body.appendChild(renderer.domElement);
         renderer.setClearColor(0xffffff, 0.5);
+        renderer.shadowMap.enabled = true;
+        renderer.physicallyCorrectLights= true;
 
         //raycast and mouse
         mouse = new THREE.Vector2();
@@ -70,23 +80,50 @@
           10000
         );
         camera.position.set(-32, 32, 32);
-        camera.lookAt(30,0,50);
+        camera.lookAt(30, 0, 50);
+
+        //loader
+        const loader = new THREE.GLTFLoader();
+        loader.load(
+          // resource URL
+          "piese/piesa.glb",
+          // called when the resource is loaded
+          function (gltf) {
+            scene.add(gltf.scene);
+            gltf.scene.scale.set(5,5,5);
+            gltf.scene.position.set(10,10,0)
+            gltf.animations; // Array<THREE.AnimationClip>
+            gltf.scene; // THREE.Group
+            gltf.scenes; // Array<THREE.Group>
+            gltf.cameras; // Array<THREE.Camera>
+            gltf.asset; // Object
+          },
+          // called while loading is progressing
+          function (xhr) {
+            console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+          },
+          // called when loading has errors
+          function (error) {
+            console.log("An error happened");
+          }
+        );
 
         // controls
         controls = new OrbitControls(camera, renderer.domElement);
-        controls.target.set( 32, 0, 32 );
+        controls.target.set(32, 0, 32);
         controls.update();
         // ambient
-        scene.add(new THREE.AmbientLight(0x222222));
+        //scene.add(new THREE.AmbientLight(0x222222));
 
         // light
         var light = new THREE.DirectionalLight(0xffffff, 1);
+        light.castShadow = true;
+        light.shadow.radius = 8;
         light.position.set(50, 50, 50);
         scene.add(light);
 
         // axes
         scene.add(new THREE.AxesHelper(10));
-        
 
         // material
         var material = new THREE.MeshPhongMaterial({
@@ -138,7 +175,7 @@
         }
         function tabla(Tilesperrow, sizeOfTiles) {
           for (var i = 1; i <= Tilesperrow; i++) {
-            createLine(0, i-2, i % 2, sizeOfTiles);
+            createLine(0, i - 2, i % 2, sizeOfTiles);
           }
         }
         tabla(8, 10);
@@ -147,16 +184,16 @@
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObjects(group.children);
         if (intersects.length > 0) {
-            intersects[0].object.material.opacity = 0.5;
-            intersects[0].object.material.transparent = true;
-            intersects[0].object.position.y+=2;
+          intersects[0].object.material.opacity = 0.5;
+          intersects[0].object.material.transparent = true;
+          intersects[0].object.position.y += 2;
         }
       }
       function resetMaterials() {
         for (let i = 0; i < group.children.length; i++) {
           if (group.children[i].material) {
             group.children[i].material.opacity = 1;
-            group.children[i].position.y=0
+            group.children[i].position.y = 0;
           }
         }
       }
@@ -164,7 +201,9 @@
         requestAnimationFrame(animate);
         resetMaterials();
         hoverTile();
-        document.getElementById("test").innerHTML = `${camera.position.x} ${camera.position.y} ${camera.position.z} \n `;
+        document.getElementById(
+          "test"
+        ).innerHTML = `${camera.position.x} ${camera.position.y} ${camera.position.z} \n `;
         //controls.update();
         renderer.render(scene, camera);
       }
